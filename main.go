@@ -7,13 +7,16 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 type Config struct {
-	BaseURL  string
-	Host     string
-	User     string
-	Password string
+	BaseURL   string
+	Host      string
+	User      string
+	Password  string
+	Daemon    bool
+	Frequency int
 }
 
 func readConfig(c *cli.Context) (err error, config *Config) {
@@ -48,6 +51,14 @@ func readConfig(c *cli.Context) (err error, config *Config) {
 	if config.Password == "" {
 		// Log out error
 		err = errors.New("--pass not defined, see usage.")
+		return
+	}
+
+	config.Daemon = c.Bool("daemon")
+	config.Frequency = c.Int("frequency")
+	if config.Frequency == 0 {
+		// Log out error
+		err = errors.New("--frequency must be greater than zero.")
 		return
 	}
 
@@ -132,6 +143,15 @@ func main() {
 			Value: "",
 			Usage: "API Password for authentication on ynds.",
 		},
+		cli.BoolFlag{
+			Name:  "daemon,d",
+			Usage: "Enables the updater as a daemon.",
+		},
+		cli.IntFlag{
+			Name:  "frequency,f",
+			Value: 15,
+			Usage: "Number of minutes inbetween updates",
+		},
 	}
 	app.Action = func(c *cli.Context) {
 		// Read config from context
@@ -144,8 +164,21 @@ func main() {
 			return
 		}
 
-		// Perform update
-		performUpdate(config)
+		if config.Daemon {
+			for {
+				// Perform update
+				performUpdate(config)
+
+				// Sleeps before update
+				log.Printf("Now waiting %d minutes.", config.Frequency)
+
+				time.Sleep(time.Duration(config.Frequency) * time.Minute)
+			}
+
+		} else {
+			// Perform update
+			performUpdate(config)
+		}
 	}
 
 	app.Run(os.Args)

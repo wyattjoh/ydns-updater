@@ -4,4 +4,7 @@ After=network-online.target
 
 [Service]
 TimeoutStartSec=0
-ExecStart=/root/go/bin/ydns-updater --host "" --user "" --pass ""
+ExecStart=/root/go/bin/ydns-updater --daemon --host "" --user "" --pass ""
+
+[Install]
+WantedBy=multi-user.target

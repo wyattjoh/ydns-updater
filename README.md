@@ -2,7 +2,7 @@
 
 [![Gobuild Download](http://gobuild.io/badge/github.com/codeskyblue/gobuild/download.png)](http://gobuild.io/github.com/wyattjoh/ydns-updater)
 
-A lightweight appplication which updates a dns entry on [yDNS](https://ydns.eu/) using systemd units provided in `systemd/`.
+A lightweight appplication which updates a dns entry on [yDNS](https://ydns.eu/) using systemd unit provided in `systemd/ydns-updater.service`.
 
 ## Getting started
 
@@ -13,7 +13,7 @@ A lightweight appplication which updates a dns entry on [yDNS](https://ydns.eu/)
 go get github.com/wyattjoh/ydns-updater
 
 # Install the systemd files
-cp $GOPATH/src/github.com/wyattjoh/ydns-updater/systemd/ydns-updater.{timer,service} /etc/systemd/system
+cp $GOPATH/src/github.com/wyattjoh/ydns-updater/systemd/ydns-updater.service /etc/systemd/system
 
 # Edit the systemd file
 #
@@ -25,13 +25,13 @@ cp $GOPATH/src/github.com/wyattjoh/ydns-updater/systemd/ydns-updater.{timer,serv
 vim /etc/systemd/system/ydns-updater.service
 
 # Start and enable timer
-systemctl start ydns-updater.timer
-systemctl enable ydns-updater.timer
+systemctl start ydns-updater.service
+systemctl enable ydns-updater.service
 ```
 
 ### Precompiled
 
 1. Visit http://gobuild.io/github.com/wyattjoh/ydns-updater and download the binary
-2. Download systemd unit files and install into `/etc/systemd/system`
-3. Start timer `systemctl start ydns-updater.timer`
-4. Enable timer `systemctl enable ydns-updater.timer`
+2. Download systemd unit file and install into `/etc/systemd/system`
+3. Start timer `systemctl start ydns-updater.service`
+4. Enable timer `systemctl enable ydns-updater.service`
