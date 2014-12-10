@@ -4,6 +4,8 @@ A lightweight appplication which updates a dns entry on [yDNS](https://ydns.eu/)
 
 ## Getting started
 
+### From source
+
 ```bash
 # Get the code
 go get github.com/wyattjoh/ydns-updater
@@ -21,3 +23,10 @@ vim /etc/systemd/system/ydns-updater.service
 systemctl start ydns-updater.timer
 systemctl enable ydns-updater.timer
 ```
+
+### Precompiled
+
+1. Visit http://gobuild.io/github.com/wyattjoh/ydns-updater and download the binary
+2. Download systemd unit files and install into `/etc/systemd/system`
+3. Start timer `systemctl start ydns-updater.timer`
+4. Enable timer `systemctl enable ydns-updater.timer`
