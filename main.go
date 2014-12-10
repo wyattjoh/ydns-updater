@@ -138,10 +138,7 @@ func main() {
 		err, config := readConfig(c)
 		if err != nil {
 			// Print log
-			log.Println(err)
-
-			// Show application help
-			cli.ShowAppHelp(c)
+			log.Fatal(err)
 
 			// Exit
 			return
