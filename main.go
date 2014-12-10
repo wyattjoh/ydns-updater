@@ -23,7 +23,7 @@ func readConfig(c *cli.Context) (err error, config *Config) {
 	config.BaseURL = c.String("base")
 	if config.BaseURL == "" {
 		// Log out error
-		err = errors.New("--base not defined.")
+		err = errors.New("--base not defined, see usage.")
 		return
 	}
 
@@ -31,7 +31,7 @@ func readConfig(c *cli.Context) (err error, config *Config) {
 	config.Host = c.String("host")
 	if config.Host == "" {
 		// Log out error
-		err = errors.New("--host not defined.")
+		err = errors.New("--host not defined, see usage.")
 		return
 	}
 
@@ -39,7 +39,7 @@ func readConfig(c *cli.Context) (err error, config *Config) {
 	config.User = c.String("user")
 	if config.User == "" {
 		// Log out error
-		err = errors.New("--user not defined.")
+		err = errors.New("--user not defined, see usage.")
 		return
 	}
 
@@ -47,7 +47,7 @@ func readConfig(c *cli.Context) (err error, config *Config) {
 	config.Password = c.String("pass")
 	if config.Password == "" {
 		// Log out error
-		err = errors.New("--pass not defined.")
+		err = errors.New("--pass not defined, see usage.")
 		return
 	}
 
