@@ -13,8 +13,8 @@ cp $GOPATH/src/github.com/wyattjoh/ydns-updater/systemd/ydns-updater.{timer,serv
 
 # Edit the systemd file to add in params
 # --host "<HOST TO UPDATE>"
-# --user "<API USERNAME>"
-# --pass "<API PASS>"
+# --user "<API USERNAME>" Found https://ydns.eu/api/
+# --pass "<API PASS>" Found https://ydns.eu/api/
 vim /etc/systemd/system/ydns-updater.service
 
 # Start and enable timer
