@@ -24,7 +24,7 @@ cp $GOPATH/src/github.com/wyattjoh/ydns-updater/systemd/ydns-updater.service /et
 # --pass "<API PASS>" Found https://ydns.eu/api/
 vim /etc/systemd/system/ydns-updater.service
 
-# Start and enable timer
+# Start and enable service
 systemctl start ydns-updater.service
 systemctl enable ydns-updater.service
 ```
@@ -33,5 +33,5 @@ systemctl enable ydns-updater.service
 
 1. Visit http://gobuild.io/github.com/wyattjoh/ydns-updater and download the binary
 2. Download systemd unit file and install into `/etc/systemd/system`
-3. Start timer `systemctl start ydns-updater.service`
-4. Enable timer `systemctl enable ydns-updater.service`
+3. Start service `systemctl start ydns-updater.service`
+4. Enable service `systemctl enable ydns-updater.service`
