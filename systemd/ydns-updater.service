@@ -1,0 +1,7 @@
+[Unit]
+Description=yDNS Updater
+After=network-online.target
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/root/go/bin/ydns-updater

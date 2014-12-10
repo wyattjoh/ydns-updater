@@ -1,0 +1,11 @@
+[Unit]
+Description=yDNS Updater
+After=network-online.target
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target
