@@ -149,7 +149,7 @@ func main() {
 		},
 		cli.IntFlag{
 			Name:  "frequency,f",
-			Value: 15,
+			Value: 60,
 			Usage: "Number of minutes inbetween updates",
 		},
 	}
