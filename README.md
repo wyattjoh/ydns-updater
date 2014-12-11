@@ -2,7 +2,7 @@
 
 [![Gobuild Download](http://gobuild.io/badge/github.com/codeskyblue/gobuild/download.png)](http://gobuild.io/github.com/wyattjoh/ydns-updater)
 
-A lightweight appplication which updates a dns entry on [yDNS](https://ydns.eu/) using systemd unit provided in `systemd/ydns-updater.service`.
+A lightweight appplication which updates a dns entry on [https://ydns.eu/](https://ydns.eu/) using systemd unit provided in `systemd/ydns-updater.service`.
 
 ## Getting started
 
