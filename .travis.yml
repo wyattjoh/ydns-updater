@@ -1,0 +1,14 @@
+language: go
+
+go:
+  - 1.7
+
+install:
+  - go get -u github.com/golang/lint/golint
+
+before_script:
+  - for package in $(go list ./...); do golint -set_exit_status $package; done
+  - go vet $(go list ./...)
+
+script:
+  - go test $(go list ./...)

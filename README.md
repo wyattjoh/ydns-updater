@@ -1,6 +1,6 @@
 # yDNS Updater
 
-[![Gobuild Download](http://gobuild.io/badge/github.com/codeskyblue/gobuild/download.png)](http://gobuild.io/github.com/wyattjoh/ydns-updater)
+[![Build Status](https://travis-ci.org/wyattjoh/ydns-updater.svg?branch=master)](https://travis-ci.org/wyattjoh/ydns-updater)
 
 A lightweight appplication which updates a dns entry on [https://ydns.eu/](https://ydns.eu/) using a systemd unit provided in `systemd/ydns-updater.service`. This will take the servers current ip address and update the associated DNS entry. Perfect for connecting to your home network if it has a dynamic ip address.
 
@@ -31,7 +31,7 @@ systemctl enable ydns-updater.service
 
 ### Precompiled
 
-1. Visit http://gobuild.io/github.com/wyattjoh/ydns-updater and download the binary
+1. Download pre-compiled binary on the [Releases Page](https://github.com/wyattjoh/ydns-updater/releases/latest) for your Arch/OS
 2. Download systemd unit file and install into `/etc/systemd/system`
 3. Start service `systemctl start ydns-updater.service`
 4. Enable service `systemctl enable ydns-updater.service`
