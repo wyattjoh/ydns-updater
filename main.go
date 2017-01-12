@@ -2,7 +2,8 @@ package main
 
 import (
 	"errors"
-	"github.com/codegangsta/cli"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -10,64 +11,40 @@ import (
 	"time"
 )
 
+// Config describes the configuration options for the update operation.
 type Config struct {
-	BaseURL   string
-	Host      string
-	User      string
-	Password  string
-	Daemon    bool
-	Frequency int
+	BaseURL  string
+	Host     string
+	User     string
+	Password string
 }
 
-func readConfig(c *cli.Context) (err error, config *Config) {
-	config = &Config{}
+func verifyConfig(config Config) error {
 
-	// Grab flag
-	config.BaseURL = c.String("base")
 	if config.BaseURL == "" {
-		// Log out error
-		err = errors.New("--base not defined, see usage.")
-		return
+		return errors.New("--base not defined, see usage")
 	}
 
-	// Grab flag
-	config.Host = c.String("host")
 	if config.Host == "" {
-		// Log out error
-		err = errors.New("--host not defined, see usage.")
-		return
+		return errors.New("--host not defined, see usage")
+
 	}
 
-	// Grab flag
-	config.User = c.String("user")
 	if config.User == "" {
-		// Log out error
-		err = errors.New("--user not defined, see usage.")
-		return
+		return errors.New("--user not defined, see usage")
 	}
 
-	// Grab flag
-	config.Password = c.String("pass")
 	if config.Password == "" {
-		// Log out error
-		err = errors.New("--pass not defined, see usage.")
-		return
+		return errors.New("--pass not defined, see usage")
 	}
 
-	config.Daemon = c.Bool("daemon")
-	config.Frequency = c.Int("frequency")
-	if config.Frequency == 0 {
-		// Log out error
-		err = errors.New("--frequency must be greater than zero.")
-		return
-	}
-
-	return
+	return nil
 }
 
-func performUpdate(c *Config) {
+func performUpdate(c Config) {
+
 	// Build the url
-	updateUrl, err := url.Parse(c.BaseURL)
+	updateURL, err := url.Parse(c.BaseURL)
 	if err != nil {
 		log.Fatal("Cannot create url:", err)
 	}
@@ -79,10 +56,10 @@ func performUpdate(c *Config) {
 	updateParams.Add("host", c.Host)
 
 	// Add query params to url
-	updateUrl.RawQuery = updateParams.Encode()
+	updateURL.RawQuery = updateParams.Encode()
 
 	// Build a request
-	req, err := http.NewRequest("GET", updateUrl.String(), nil)
+	req, err := http.NewRequest("GET", updateURL.String(), nil)
 	if err != nil {
 		log.Fatal("Cannot create request:", err)
 	}
@@ -119,67 +96,41 @@ func performUpdate(c *Config) {
 }
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "ydns-updater"
-	app.Usage = "updates dns entries on ydns"
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "base",
-			Value: "https://ydns.eu/api/v1/update/",
-			Usage: "Base url for api calls on ydns.",
-		},
-		cli.StringFlag{
-			Name:  "host",
-			Value: "",
-			Usage: "Host to update.",
-		},
-		cli.StringFlag{
-			Name:  "user",
-			Value: "",
-			Usage: "API Username for authentication on ynds.",
-		},
-		cli.StringFlag{
-			Name:  "pass",
-			Value: "",
-			Usage: "API Password for authentication on ynds.",
-		},
-		cli.BoolFlag{
-			Name:  "daemon,d",
-			Usage: "Enables the updater as a daemon.",
-		},
-		cli.IntFlag{
-			Name:  "frequency,f",
-			Value: 60,
-			Usage: "Number of minutes inbetween updates",
-		},
+
+	base := flag.String("base", "https://ydns.eu/api/v1/update/", "Base url for api calls on ydns")
+	host := flag.String("host", "", "Host to update")
+	user := flag.String("user", "", "API Username for authentication on ynds")
+	pass := flag.String("pass", "", "API Password for authentication on ynds")
+	daemon := flag.Bool("daemon, d", false, "Enables the updater as a daemon")
+	freq := flag.Int("frequency, f", 60, "Minutes inbetween updates while in daemon mode")
+
+	flag.Parse()
+
+	config := Config{
+		BaseURL:  *base,
+		Host:     *host,
+		User:     *user,
+		Password: *pass,
 	}
-	app.Action = func(c *cli.Context) {
-		// Read config from context
-		err, config := readConfig(c)
-		if err != nil {
-			// Print log
-			log.Fatal(err)
 
-			// Exit
-			return
-		}
+	// Verify config.
+	if err := verifyConfig(config); err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
-		if config.Daemon {
-			for {
-				// Perform update
-				performUpdate(config)
+	if *daemon {
 
-				// Sleeps before update
-				log.Printf("Now waiting %d minutes.", config.Frequency)
-
-				time.Sleep(time.Duration(config.Frequency) * time.Minute)
-			}
-
-		} else {
-			// Perform update
+		for {
+			// Perform update and then wait for the set duration of minutes.
 			performUpdate(config)
-		}
-	}
 
-	app.Run(os.Args)
+			log.Printf("Now waiting %d minutes.", *freq)
+			time.Sleep(time.Duration(*freq) * time.Minute)
+		}
+	} else {
+
+		// Perform update now.
+		performUpdate(config)
+	}
 }
