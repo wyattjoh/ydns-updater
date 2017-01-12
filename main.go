@@ -49,31 +49,22 @@ func performUpdate(c Config) {
 		log.Fatal("Cannot create url:", err)
 	}
 
-	// Build the update params
-	var updateParams url.Values = make(url.Values)
-
-	// Add the host param
+	// Add the host query parameter to the update url.
+	updateParams := url.Values{}
 	updateParams.Add("host", c.Host)
 
-	// Add query params to url
 	updateURL.RawQuery = updateParams.Encode()
 
-	// Build a request
 	req, err := http.NewRequest("GET", updateURL.String(), nil)
 	if err != nil {
 		log.Fatal("Cannot create request:", err)
 	}
 
-	// Set authentication
 	req.SetBasicAuth(c.User, c.Password)
-
-	// Get the http client
-	client := &http.Client{}
 
 	log.Printf("Updating record %s...", c.Host)
 
-	// Ask the client to perform request
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal("Cannot perform http get:", err)
 	}
@@ -92,7 +83,6 @@ func performUpdate(c Config) {
 	default:
 		log.Fatal("Some unknown error occured:", resp.Status)
 	}
-
 }
 
 func main() {
