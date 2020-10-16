@@ -29,6 +29,12 @@ systemctl start ydns-updater.service
 systemctl enable ydns-updater.service
 ```
 
+### Installation Via Homebrew
+
+```
+brew install wyattjoh/stable/ydns-updater
+```
+
 ### Precompiled
 
 1. Download pre-compiled binary on the [Releases Page](https://github.com/wyattjoh/ydns-updater/releases/latest) for your Arch/OS
