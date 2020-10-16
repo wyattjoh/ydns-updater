@@ -1,0 +1,8 @@
+[linters]
+  enable-all = true
+  disable = [
+    "lll",
+  ]
+
+[issues]
+    exclude-use-default = true

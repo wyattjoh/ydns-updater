@@ -87,7 +87,7 @@ func performUpdate(c Config) {
 
 func main() {
 
-	base := flag.String("base", "https://ydns.eu/api/v1/update/", "Base url for api calls on ydns")
+	base := flag.String("base", "https://ydns.io/api/v1/update/", "Base url for api calls on ydns")
 	host := flag.String("host", "", "Host to update")
 	user := flag.String("user", "", "API Username for authentication on ynds")
 	pass := flag.String("pass", "", "API Password for authentication on ynds")

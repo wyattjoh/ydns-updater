@@ -1,0 +1,50 @@
+project_name: ydns-updater
+
+builds:
+  - binary: ydns-updater
+    goos:
+      - windows
+      - darwin
+      - linux
+      - freebsd
+      - openbsd
+      - solaris
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+    goarm:
+      - 7
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: openbsd
+        goarch: arm
+
+brews:
+  - github:
+      owner: wyattjoh
+      name: homebrew-stable
+    folder: Formula
+    homepage: https://github.com/wyattjoh/ydns-updater
+    description: YDNS DNS Updater
+    test: |
+      system "#{bin}/ydns-updater -v"
+    install: |
+      bin.install "ydns-updater"
+
+archives:
+  - name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE.md
+      - README.md
+
+release:
+  github:
+    owner: wyattjoh
+    name: ydns-updater
