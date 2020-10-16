@@ -2,6 +2,8 @@
   enable-all = true
   disable = [
     "lll",
+    "goerr113",
+    "noctx"
   ]
 
 [issues]
