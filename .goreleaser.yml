@@ -23,7 +23,7 @@ builds:
         goarch: arm
 
 brews:
-  - github:
+  - tap:
       owner: wyattjoh
       name: homebrew-stable
     folder: Formula
@@ -43,6 +43,7 @@ archives:
     files:
       - LICENSE.md
       - README.md
+      - systemd
 
 release:
   github:
