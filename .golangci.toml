@@ -3,7 +3,11 @@
   disable = [
     "lll",
     "goerr113",
-    "noctx"
+    "noctx",
+    "gomnd",
+    "gochecknoglobals",
+    "exhaustivestruct",
+    "funlen"
   ]
 
 [issues]
