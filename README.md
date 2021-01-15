@@ -1,6 +1,6 @@
 # yDNS Updater
 
-[![Build Status](https://travis-ci.org/wyattjoh/ydns-updater.svg?branch=master)](https://travis-ci.org/wyattjoh/ydns-updater)
+![Test](https://github.com/wyattjoh/ydns-updater/workflows/Test/badge.svg)
 
 A lightweight appplication which updates a dns entry on [https://ydns.eu/](https://ydns.eu/) using a systemd unit provided in `systemd/ydns-updater.service`. This will take the servers current ip address and update the associated DNS entry. Perfect for connecting to your home network if it has a dynamic ip address.
 
