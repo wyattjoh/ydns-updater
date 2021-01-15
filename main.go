@@ -88,10 +88,10 @@ func main() {
 			Name:  "daemon",
 			Usage: "enables the updater as a daemon",
 		},
-		&cli.IntFlag{
+		&cli.DurationFlag{
 			Name:  "frequency",
-			Value: 60,
-			Usage: " minutes between updates while in daemon mode",
+			Value: 60 * time.Minute,
+			Usage: "sleep time between updates while in daemon mode",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
@@ -100,17 +100,15 @@ func main() {
 		user := c.String("user")
 		pass := c.String("pass")
 		daemon := c.Bool("daemon")
-		frequency := c.Int("frequency")
-
-		sleep := time.Duration(frequency) * time.Minute
+		frequency := c.Duration("frequency")
 
 		if err := run(base, host, user, pass); err != nil {
 			return cli.Exit(err, 1)
 		}
 
 		for daemon {
-			logrus.WithField("sleep", sleep).Info("sleeping till next update")
-			time.Sleep(sleep)
+			logrus.WithField("sleep", frequency).Info("sleeping till next update")
+			time.Sleep(frequency)
 
 			if err := run(base, host, user, pass); err != nil {
 				return cli.Exit(err, 1)
