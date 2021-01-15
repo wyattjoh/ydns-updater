@@ -1,66 +1,39 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
 )
 
-// Config describes the configuration options for the update operation.
-type Config struct {
-	BaseURL  string
-	Host     string
-	User     string
-	Password string
-}
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
 
-func verifyConfig(config Config) error {
-	if config.BaseURL == "" {
-		return errors.New("--base not defined, see usage")
-	}
-
-	if config.Host == "" {
-		return errors.New("--host not defined, see usage")
-	}
-
-	if config.User == "" {
-		return errors.New("--user not defined, see usage")
-	}
-
-	if config.Password == "" {
-		return errors.New("--pass not defined, see usage")
-	}
-
-	return nil
-}
-
-func performUpdate(c Config) error {
-	// Build the url
-	updateURL, err := url.Parse(c.BaseURL)
+func run(base, host, user, pass string) error {
+	u, err := url.Parse(base)
 	if err != nil {
 		return errors.Wrap(err, "cannot create url")
 	}
 
-	// Add the host query parameter to the update url.
-	updateParams := url.Values{}
-	updateParams.Add("host", c.Host)
+	u.Query().Add("host", host)
 
-	updateURL.RawQuery = updateParams.Encode()
-
-	req, err := http.NewRequest("GET", updateURL.String(), nil)
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return errors.Wrap(err, "cannot create request")
 	}
 
-	req.SetBasicAuth(c.User, c.Password)
+	req.SetBasicAuth(user, pass)
 
-	log.Printf("Updating record %s...", c.Host)
+	logrus.WithField("host", host).Info("updating record")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -71,7 +44,7 @@ func performUpdate(c Config) error {
 	// Log based on request status code
 	switch res.StatusCode {
 	case http.StatusOK:
-		log.Printf("update of %s was successful.\n", c.Host)
+		logrus.WithField("host", host).Info("update was successful")
 	case http.StatusBadRequest:
 		return errors.New("failed to perform request due to invalid input parameters")
 	case http.StatusUnauthorized:
@@ -79,48 +52,75 @@ func performUpdate(c Config) error {
 	case http.StatusNotFound:
 		return errors.New("failed to perform request because the host you'd like to update cannot be found")
 	default:
-		return fmt.Errorf("some unknown error occurred: %v", res.Status)
+		return errors.Errorf("some unknown error occurred: %s", res.Status)
 	}
 
 	return nil
 }
 
 func main() {
-	base := flag.String("base", "https://ydns.io/api/v1/update/", "Base url for api calls on ydns")
-	host := flag.String("host", "", "Host to update")
-	user := flag.String("user", "", "API Username for authentication on ynds")
-	pass := flag.String("pass", "", "API Password for authentication on ynds")
-	daemon := flag.Bool("daemon", false, "Enables the updater as a daemon")
-	freq := flag.Int("frequency", 60, "Minutes between updates while in daemon mode")
-
-	flag.Parse()
-
-	config := Config{
-		BaseURL:  *base,
-		Host:     *host,
-		User:     *user,
-		Password: *pass,
+	app := cli.NewApp()
+	app.Name = "ydns-updater"
+	app.Version = fmt.Sprintf("%v, commit %v, built at %v", version, commit, date)
+	app.Flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:     "base",
+			Value:    "https://ydns.io/api/v1/update/",
+			Required: true,
+			Usage:    "base url for api calls on ydns",
+		},
+		&cli.StringFlag{
+			Name:     "host",
+			Required: true,
+			Usage:    "host to update",
+		},
+		&cli.StringFlag{
+			Name:     "user",
+			Required: true,
+			Usage:    "username for authentication on ydns",
+		},
+		&cli.StringFlag{
+			Name:     "pass",
+			Required: true,
+			Usage:    "password for authentication on ydns",
+		},
+		&cli.BoolFlag{
+			Name:  "daemon",
+			Usage: "enables the updater as a daemon",
+		},
+		&cli.IntFlag{
+			Name:  "frequency",
+			Value: 60,
+			Usage: " minutes between updates while in daemon mode",
+		},
 	}
+	app.Action = func(c *cli.Context) error {
+		base := c.String("base")
+		host := c.String("host")
+		user := c.String("user")
+		pass := c.String("pass")
+		daemon := c.Bool("daemon")
+		frequency := c.Int("frequency")
 
-	// Verify config.
-	if err := verifyConfig(config); err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
-	}
+		sleep := time.Duration(frequency) * time.Minute
 
-	if *daemon {
-		for {
-			// Perform update and then wait for the set duration of minutes.
-			if err := performUpdate(config); err != nil {
-				log.Fatal(err.Error())
-			}
-
-			log.Printf("Now waiting %d minutes.", *freq)
-			time.Sleep(time.Duration(*freq) * time.Minute)
+		if err := run(base, host, user, pass); err != nil {
+			return cli.Exit(err, 1)
 		}
+
+		for daemon {
+			logrus.WithField("sleep", sleep).Info("sleeping till next update")
+			time.Sleep(sleep)
+
+			if err := run(base, host, user, pass); err != nil {
+				return cli.Exit(err, 1)
+			}
+		}
+
+		return nil
 	}
 
-	if err := performUpdate(config); err != nil {
-		log.Fatal(err.Error())
+	if err := app.Run(os.Args); err != nil {
+		logrus.WithError(err).Fatal()
 	}
 }
