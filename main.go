@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -24,7 +25,10 @@ func run(base, host, user, pass string) error {
 		return errors.Wrap(err, "cannot create url")
 	}
 
-	u.Query().Add("host", host)
+	values := url.Values{}
+	values.Set("host", host)
+
+	u.RawQuery = values.Encode()
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -40,6 +44,16 @@ func run(base, host, user, pass string) error {
 		return errors.Wrap(err, "cannot perform http get")
 	}
 	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return errors.Wrap(err, "cannot read the body")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"body":   string(body),
+		"status": res.StatusCode,
+	}).Debug("got response from api")
 
 	// Log based on request status code
 	switch res.StatusCode {
@@ -64,10 +78,9 @@ func main() {
 	app.Version = fmt.Sprintf("%v, commit %v, built at %v", version, commit, date)
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
-			Name:     "base",
-			Value:    "https://ydns.io/api/v1/update/",
-			Required: true,
-			Usage:    "base url for api calls on ydns",
+			Name:  "base",
+			Value: "https://ydns.io/api/v1/update/",
+			Usage: "base url for api calls on ydns",
 		},
 		&cli.StringFlag{
 			Name:     "host",
@@ -93,6 +106,10 @@ func main() {
 			Value: 60 * time.Minute,
 			Usage: "sleep time between updates while in daemon mode",
 		},
+		&cli.BoolFlag{
+			Name:  "debug",
+			Usage: "enables debug logging",
+		},
 	}
 	app.Action = func(c *cli.Context) error {
 		base := c.String("base")
@@ -101,6 +118,10 @@ func main() {
 		pass := c.String("pass")
 		daemon := c.Bool("daemon")
 		frequency := c.Duration("frequency")
+
+		if c.Bool("debug") {
+			logrus.SetLevel(logrus.DebugLevel)
+		}
 
 		if err := run(base, host, user, pass); err != nil {
 			return cli.Exit(err, 1)
