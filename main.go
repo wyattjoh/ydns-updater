@@ -84,27 +84,32 @@ func main() {
 		},
 		&cli.StringFlag{
 			Name:     "host",
+			EnvVars:  []string{"YDNS_HOST"},
 			Required: true,
 			Usage:    "host to update",
 		},
 		&cli.StringFlag{
 			Name:     "user",
+			EnvVars:  []string{"YDNS_USER"},
 			Required: true,
 			Usage:    "username for authentication on ydns",
 		},
 		&cli.StringFlag{
 			Name:     "pass",
+			EnvVars:  []string{"YDNS_PASS"},
 			Required: true,
 			Usage:    "password for authentication on ydns",
 		},
 		&cli.BoolFlag{
-			Name:  "daemon",
-			Usage: "enables the updater as a daemon",
+			Name:    "daemon",
+			EnvVars: []string{"YDNS_DAEMON"},
+			Usage:   "enables the updater as a daemon",
 		},
 		&cli.DurationFlag{
-			Name:  "frequency",
-			Value: 60 * time.Minute,
-			Usage: "sleep time between updates while in daemon mode",
+			Name:    "frequency",
+			EnvVars: []string{"YDNS_FREQUENCY"},
+			Value:   60 * time.Minute,
+			Usage:   "sleep time between updates while in daemon mode",
 		},
 		&cli.BoolFlag{
 			Name:  "debug",
