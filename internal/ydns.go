@@ -1,7 +1,7 @@
 package ydns
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -36,7 +36,7 @@ func Run(base, host, user, pass string) error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return errors.Wrap(err, "cannot read the body")
 	}

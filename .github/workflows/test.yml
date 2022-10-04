@@ -10,12 +10,12 @@ jobs:
   test:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2.4.0
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
         with:
-          go-version: "^1.15.6"
-      - uses: golangci/golangci-lint-action@v2.5.2
+          go-version: "^1.19.1"
+      - uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.34
+          version: latest
       - name: Unit testing
         run: go test ./...
