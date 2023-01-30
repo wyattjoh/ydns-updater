@@ -22,7 +22,7 @@ jobs:
           version: latest
       - name: Unit testing
         run: go test ./...
-      - uses: goreleaser/goreleaser-action@v3.1.0
+      - uses: goreleaser/goreleaser-action@v4.1.1
         with:
           version: latest
           args: release --rm-dist
