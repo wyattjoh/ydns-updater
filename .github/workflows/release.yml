@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Note the fetch-depth: 0 option is required for the change log to
           # work correctly with goreleaser.
@@ -22,7 +22,7 @@ jobs:
           version: latest
       - name: Unit testing
         run: go test ./...
-      - uses: goreleaser/goreleaser-action@v7.0.0
+      - uses: goreleaser/goreleaser-action@v7.2.2
         with:
           version: latest
           args: release --rm-dist
